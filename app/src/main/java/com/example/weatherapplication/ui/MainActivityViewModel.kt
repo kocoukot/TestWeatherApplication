@@ -21,15 +21,21 @@ class MainActivityViewModel(
 
     fun getForecast(place: String) {
         viewModelScope.launch {
-
+            _state.update { it.copy(isLoading = true) }
             when (val response = weatherAppRepository.getWeather(place)) {
                 is Resource.Failure -> {
-                    _state.update { it.copy(isError = AlertType.TextAlert(response.error.localizedMessage)) }
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                            isError = AlertType.TextAlert(response.error.localizedMessage)
+                        )
+                    }
                 }
 
                 is Resource.Success -> {
                     _state.update {
                         it.copy(
+                            isLoading = false,
                             forecast = response.value,
                             currentScreen = WeatherAppScreens.WEATHER_INFO,
                             typedPlace = place

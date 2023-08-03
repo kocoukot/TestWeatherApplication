@@ -22,8 +22,8 @@ import com.example.weatherapplication.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun InputScreen(onGetForecast: (String) -> Unit) {
-    var value by rememberSaveable { mutableStateOf("") }
+fun InputScreen(input: String, onGetForecast: (String) -> Unit) {
+    var value by rememberSaveable { mutableStateOf(input) }
 
     Column(
         modifier = Modifier.fillMaxSize(),

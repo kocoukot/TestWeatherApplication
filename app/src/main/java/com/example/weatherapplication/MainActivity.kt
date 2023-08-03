@@ -8,6 +8,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -17,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.window.Dialog
 import com.example.weatherapplication.common.theme.WeatherApplicationTheme
 import com.example.weatherapplication.domain.model.AlertType
 import com.example.weatherapplication.domain.model.WeatherAppScreens
@@ -36,13 +38,17 @@ class MainActivity : ComponentActivity() {
         setContent {
 
             val state by viewModel.state.collectAsState()
+            if (state.isLoading) {
+                Dialog(onDismissRequest = { }) {
+                    CircularProgressIndicator()
+                }
+            }
             WeatherApplicationTheme {
                 if (state.isError !is AlertType.EmptyAlert) {
                     state.isError.ShowError {
                         viewModel.closeError()
                     }
                 }
-
 
                 Scaffold(
                     topBar = {
@@ -65,7 +71,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Crossfade(targetState = state.currentScreen, label = "") { screen ->
                         when (screen) {
-                            WeatherAppScreens.PLACE_INPUT -> InputScreen {
+                            WeatherAppScreens.PLACE_INPUT -> InputScreen(state.typedPlace) {
                                 viewModel.getForecast(it)
                             }
 
