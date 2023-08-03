@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">WeatherApplication</string>
+    <string name="get_forecast_text">Get forecast</string>
+    <string name="town_name_or_zip_code_text">Town name or ZIP code</string>
+</resources>
