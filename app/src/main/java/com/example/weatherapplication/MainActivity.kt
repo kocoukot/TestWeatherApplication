@@ -72,12 +72,15 @@ class MainActivity : ComponentActivity() {
                                 state.typedPlace,
                                 state.isTown
                             ) { place, isTown ->
-                                viewModel.getForecast(place, isTown)
+                                viewModel.getForecast(place.trim(), isTown)
                             }
 
                             WeatherAppScreens.WEATHER_INFO -> {
                                 state.forecast?.let {
-                                    WeatherForecastScreen(state.typedPlace, it)
+                                    WeatherForecastScreen(
+                                        if (state.isTown) state.typedPlace else state.forecast?.name.orEmpty(),
+                                        it
+                                    )
                                 }
                             }
                         }

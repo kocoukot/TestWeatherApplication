@@ -1,13 +1,25 @@
 package com.example.weatherapplication.domain.model
 
+import com.example.weatherapplication.data.database.ForecastEntity
 import com.google.gson.annotations.SerializedName
 
 data class WeatherForecast(
     @SerializedName("weather") val weather: List<Weather>,
     @SerializedName("main") val main: WeatherMain,
     @SerializedName("name") val name: String,
-
+) {
+    fun toDbEntity(placeName: String, zipcode: String) = ForecastEntity(
+        place = placeName,
+        temp = main.temp,
+        feelsLike = main.feelsLike,
+        tempMin = main.tempMin,
+        tempMax = main.tempMax,
+        weather = weather.first().main,
+        description = weather.first().description,
+        date = System.currentTimeMillis(),
+        zipcode = zipcode
     )
+}
 
 class Weather(
     @SerializedName("main") val main: String,

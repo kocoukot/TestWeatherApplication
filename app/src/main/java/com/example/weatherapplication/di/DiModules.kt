@@ -1,6 +1,8 @@
 package com.example.weatherapplication.di
 
+import androidx.room.Room
 import com.example.weatherapplication.BuildConfig
+import com.example.weatherapplication.data.database.AppDatabase
 import com.example.weatherapplication.data.network.WeatherService
 import com.example.weatherapplication.data.repo.WeatherAppRepositoryImpl
 import com.example.weatherapplication.domain.WeatherAppRepository
@@ -19,6 +21,11 @@ private const val API_CONNECT_TIMEOUT = 15L
 private const val API_READ_WRITE_TIMEOUT = 30L
 
 val networkModule = module {
+
+    single { Room.databaseBuilder(get(), AppDatabase::class.java, "room_forecast.db").build() }
+
+    single { get<AppDatabase>().weatherForecast() }
+
 
     single {
         GsonBuilder()
@@ -55,7 +62,7 @@ val networkModule = module {
             .create(WeatherService::class.java)
     }
 
-    factory<WeatherAppRepository> { WeatherAppRepositoryImpl(get()) }
+    factory<WeatherAppRepository> { WeatherAppRepositoryImpl(get(), get()) }
 
     viewModel { MainActivityViewModel(get()) }
 
