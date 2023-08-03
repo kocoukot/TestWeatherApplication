@@ -1,90 +1,83 @@
 package com.example.weatherapplication
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.painterResource
 import com.example.weatherapplication.common.theme.WeatherApplicationTheme
+import com.example.weatherapplication.domain.model.AlertType
+import com.example.weatherapplication.domain.model.WeatherAppScreens
+import com.example.weatherapplication.ui.InputScreen
 import com.example.weatherapplication.ui.MainActivityViewModel
+import com.example.weatherapplication.ui.WeatherForecastScreen
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : ComponentActivity() {
+    private val viewModel: MainActivityViewModel by viewModel()
+
+    @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            var value by rememberSaveable { mutableStateOf("") }
-            val viewModel = rememberSaveable { MainActivityViewModel() }
+
+            val state by viewModel.state.collectAsState()
             WeatherApplicationTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
+                if (state.isError !is AlertType.EmptyAlert) {
+                    state.isError.ShowError {
+                        viewModel.closeError()
+                    }
+                }
+
+
+                Scaffold(
+                    topBar = {
+                        if (state.currentScreen != WeatherAppScreens.PLACE_INPUT)
+                            Box(
+                                modifier = Modifier.fillMaxWidth(),
+                                contentAlignment = Alignment.CenterStart
+                            ) {
+                                IconButton(onClick = { viewModel.goBack() }) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.arrow_back),
+                                        contentDescription = "back button"
+                                    )
+
+
+                                }
+                            }
+                    },
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
                 ) {
-                    Column(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        TextField(
-                            value = value,
-                            onValueChange = {
-                                value = it
-                            },
-                            placeholder = {
-                                Text(getString(R.string.town_name_or_zip_code_text))
-                            })
+                    Crossfade(targetState = state.currentScreen, label = "") { screen ->
+                        when (screen) {
+                            WeatherAppScreens.PLACE_INPUT -> InputScreen {
+                                viewModel.getForecast(it)
+                            }
 
-                        TextButton(
-                            modifier = Modifier.padding(top = 8.dp),
-                            onClick = {
-                                getForecast()
-                            }) {
-                            Text(getString(R.string.get_forecast_text))
-
+                            WeatherAppScreens.WEATHER_INFO -> {
+                                state.forecast?.let {
+                                    WeatherForecastScreen(state.typedPlace, it)
+                                }
+                            }
                         }
-
                     }
                 }
             }
         }
-    }
-
-    private fun getForecast() {
-
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    WeatherApplicationTheme {
-        Greeting("Android")
     }
 }

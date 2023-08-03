@@ -2,12 +2,17 @@ package com.example.weatherapplication.di
 
 import com.example.weatherapplication.BuildConfig
 import com.example.weatherapplication.data.network.WeatherService
+import com.example.weatherapplication.data.repo.WeatherAppRepositoryImpl
+import com.example.weatherapplication.domain.WeatherAppRepository
+import com.example.weatherapplication.ui.MainActivityViewModel
 import com.google.gson.GsonBuilder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.parameter.ParametersHolder
 import org.koin.dsl.module
 import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 
 private const val API_CONNECT_TIMEOUT = 15L
@@ -35,11 +40,10 @@ val networkModule = module {
     }
 
     factory { parameters: ParametersHolder ->
-        val path = parameters.getOrNull<String>()
         Retrofit.Builder()
             .client(get())
             .baseUrl(BuildConfig.BASE_URL)
-//            .addConverterFactory(RetrofitConverterFactory(get()))
+            .addConverterFactory(GsonConverterFactory.create())
             .build()
     }
 //
@@ -50,5 +54,9 @@ val networkModule = module {
         get<Retrofit>()
             .create(WeatherService::class.java)
     }
+
+    factory<WeatherAppRepository> { WeatherAppRepositoryImpl(get()) }
+
+    viewModel { MainActivityViewModel(get()) }
 
 }
