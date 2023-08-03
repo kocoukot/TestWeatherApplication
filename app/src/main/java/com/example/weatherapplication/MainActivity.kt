@@ -36,7 +36,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-
             val state by viewModel.state.collectAsState()
             if (state.isLoading) {
                 Dialog(onDismissRequest = { }) {
@@ -62,8 +61,6 @@ class MainActivity : ComponentActivity() {
                                         painter = painterResource(id = R.drawable.arrow_back),
                                         contentDescription = "back button"
                                     )
-
-
                                 }
                             }
                     },
@@ -71,8 +68,11 @@ class MainActivity : ComponentActivity() {
                 ) {
                     Crossfade(targetState = state.currentScreen, label = "") { screen ->
                         when (screen) {
-                            WeatherAppScreens.PLACE_INPUT -> InputScreen(state.typedPlace) {
-                                viewModel.getForecast(it)
+                            WeatherAppScreens.PLACE_INPUT -> InputScreen(
+                                state.typedPlace,
+                                state.isTown
+                            ) { place, isTown ->
+                                viewModel.getForecast(place, isTown)
                             }
 
                             WeatherAppScreens.WEATHER_INFO -> {

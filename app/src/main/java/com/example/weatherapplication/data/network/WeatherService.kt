@@ -9,11 +9,16 @@ import retrofit2.http.Query
 interface WeatherService {
 
     @GET("data/2.5/weather")
-    suspend fun getWeather(
+    suspend fun getWeatherByTown(
         @Query("q") cityName: String,
         @Query("appid") apiKey: String = BuildConfig.API_KEY,
         @Query("units") units: String = "metric"
     ): WeatherForecast
 
-
+    @GET("data/2.5/weather")
+    suspend fun getWeatherByZip(
+        @Query("zip") cityName: String,
+        @Query("appid") apiKey: String = BuildConfig.API_KEY,
+        @Query("units") units: String = "metric"
+    ): WeatherForecast
 }

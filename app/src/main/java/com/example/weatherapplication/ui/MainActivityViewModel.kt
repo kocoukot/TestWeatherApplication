@@ -19,10 +19,10 @@ class MainActivityViewModel(
     private val _state: MutableStateFlow<WeatherAppState> = MutableStateFlow(WeatherAppState())
     val state = _state.asStateFlow()
 
-    fun getForecast(place: String) {
+    fun getForecast(place: String, isTown: Boolean) {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            when (val response = weatherAppRepository.getWeather(place)) {
+            when (val response = weatherAppRepository.getWeather(place, isTown)) {
                 is Resource.Failure -> {
                     _state.update {
                         it.copy(
@@ -38,7 +38,8 @@ class MainActivityViewModel(
                             isLoading = false,
                             forecast = response.value,
                             currentScreen = WeatherAppScreens.WEATHER_INFO,
-                            typedPlace = place
+                            typedPlace = place,
+                            isTown = isTown
                         )
                     }
                 }

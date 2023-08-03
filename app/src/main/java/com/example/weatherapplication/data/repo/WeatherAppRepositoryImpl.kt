@@ -10,9 +10,13 @@ class WeatherAppRepositoryImpl(
     private val weatherService: WeatherService
 ) : WeatherAppRepository, BaseRepository() {
 
-    override suspend fun getWeather(place: String): Resource<WeatherForecast> {
+    override suspend fun getWeather(place: String, isTown: Boolean): Resource<WeatherForecast> {
         safeApiCall {
-            weatherService.getWeather(place)
+            if (isTown) {
+                weatherService.getWeatherByTown(place)
+            } else {
+                weatherService.getWeatherByZip(place)
+            }
         }.let { response ->
             return response
         }

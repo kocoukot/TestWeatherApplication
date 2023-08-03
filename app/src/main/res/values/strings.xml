@@ -1,7 +1,10 @@
 <resources>
     <string name="app_name">WeatherApplication</string>
     <string name="get_forecast_text">Get forecast</string>
-    <string name="town_name_or_zip_code_text">Town name or ZIP code</string>
+    <string name="get_by_town_name">Search by town name or zip code</string>
+    <string name="town_name_or_zip_code_text">Town name</string>
+    <string name="zip_code_text">Zip code</string>
+    <string name="weather_type">weather: %s</string>
     <string name="temp_values">temp: %s / feels like: %s </string>
     <string name="temp_min_max">min: %s / max: %s </string>
 </resources>
